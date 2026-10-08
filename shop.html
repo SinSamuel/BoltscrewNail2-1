@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <title>ORDER HUB | BOLTSCREWNAIL</title>
+    <!-- Sharp Professional Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="shop.css">
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-93H8CZMND6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-93H8CZMND6');
+    </script>
+</head>
+<body class="shop-page">
+
+    <!-- Primary Conversion Nav -->
+    <nav id="main-nav" class="shop-nav-special visible">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand-link">BOLTSCREWNAIL</a>
+            <a href="#" class="cta-btn small-btn" id="complete-order">COMPLETE ORDER</a>
+        </div>
+    </nav>
+
+    <!-- Intelligent Sub-Navigation System -->
+    <div id="sub-nav-bar" class="sub-nav-system">
+        <div class="sub-nav-container">
+            <div class="main-cat-links">
+                <a href="#section-bolts" class="nav-main-link" data-target="bolts">BOLTS</a>
+                <a href="#section-screws" class="nav-main-link" data-target="screws">SCREWS</a>
+                <a href="#section-nails" class="nav-main-link" data-target="nails">NAILS</a>
+                <a href="#section-limited" class="nav-main-link" data-target="limited">LIMITED</a>
+            </div>
+            <div id="dynamic-sub-links" class="sub-cat-links">
+                <!-- Dynamically populated by shop.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main style="max-width: 1400px; margin: 0 auto; padding: 40px 20px;">
+        <!-- BOLTS -->
+        <section id="section-bolts" class="main-cat-section" data-cat="bolts" style="margin-bottom: 100px;">
+            <h2 class="main-category-title">BOLTS</h2>
+            <div id="sub-bolts-structural" class="sub-section-anchor" data-sub="structural"><h3 class="sub-title-clean">STRUCTURAL</h3><div id="grid-bolts-structural" class="product-grid"></div></div>
+            <div id="sub-bolts-anchor" class="sub-section-anchor" data-sub="anchor"><h3 class="sub-title-clean">ANCHOR</h3><div id="grid-bolts-anchor" class="product-grid"></div></div>
+            <div id="sub-bolts-specialty" class="sub-section-anchor" data-sub="specialty"><h3 class="sub-title-clean">SPECIALTY</h3><div id="grid-bolts-specialty" class="product-grid"></div></div>
+        </section>
+
+        <!-- SCREWS -->
+        <section id="section-screws" class="main-cat-section" data-cat="screws" style="margin-bottom: 100px;">
+            <h2 class="main-category-title">SCREWS</h2>
+            <div id="sub-screws-construction" class="sub-section-anchor" data-sub="construction"><h3 class="sub-title-clean">CONSTRUCTION</h3><div id="grid-screws-construction" class="product-grid"></div></div>
+            <div id="sub-screws-interior" class="sub-section-anchor" data-sub="interior"><h3 class="sub-title-clean">INTERIOR</h3><div id="grid-screws-interior" class="product-grid"></div></div>
+            <div id="sub-screws-masonry" class="sub-section-anchor" data-sub="masonry"><h3 class="sub-title-clean">MASONRY & METAL</h3><div id="grid-screws-masonry" class="product-grid"></div></div>
+        </section>
+
+        <!-- NAILS -->
+        <section id="section-nails" class="main-cat-section" data-cat="nails" style="margin-bottom: 100px;">
+            <h2 class="main-category-title">NAILS</h2>
+            <div id="sub-nails-strip" class="sub-section-anchor" data-sub="strip"><h3 class="sub-title-clean">STRIP</h3><div id="grid-nails-strip" class="product-grid"></div></div>
+            <div id="sub-nails-coil" class="sub-section-anchor" data-sub="coil"><h3 class="sub-title-clean">COIL</h3><div id="grid-nails-coil" class="product-grid"></div></div>
+            <div id="sub-nails-finish" class="sub-section-anchor" data-sub="finish"><h3 class="sub-title-clean">FINISH</h3><div id="grid-nails-finish" class="product-grid"></div></div>
+            <div id="sub-nails-bulk" class="sub-section-anchor" data-sub="bulk"><h3 class="sub-title-clean">BULK</h3><div id="grid-nails-bulk" class="product-grid"></div></div>
+            <div id="sub-nails-staples" class="sub-section-anchor" data-sub="staples"><h3 class="sub-title-clean">STAPLES</h3><div id="grid-nails-staples" class="product-grid"></div></div>
+        </section>
+
+        <!-- LIMITED: liquidation stock, power tools, limited quantities, added to the same cart -->
+        <section id="section-limited" class="main-cat-section" data-cat="limited" style="margin-bottom: 100px;">
+            <h2 class="main-category-title">LIMITED</h2>
+            <div id="sub-limited-power-tools" class="sub-section-anchor" data-sub="power tools"><h3 class="sub-title-clean">POWER TOOLS</h3><div id="grid-limited-power-tools" class="product-grid"></div></div>
+            <div id="sub-limited-lots" class="sub-section-anchor" data-sub="lots"><h3 class="sub-title-clean">LOTS</h3><div id="grid-limited-lots" class="product-grid"></div></div>
+        </section>
+    </main>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content detail-style">
+            <span class="close-modal-btn">&times;</span>
+            <div class="modal-layout">
+                <div id="modal-img-container" class="modal-image"></div>
+                <div class="modal-info">
+                    <h2 id="modal-title" style="font-size: 2rem; font-weight: 950;">Product Name</h2>
+                    <div style="border-top: 1px solid #333; margin-top: 20px; padding-top: 20px;">
+                        <h4 style="font-size: 0.7rem; color: #555; margin-bottom: 10px;">TECHNICAL DESCRIPTION</h4>
+                        <p id="modal-desc" style="color: #fff; font-size: 1.3rem; font-weight: 700;">Description text.</p>
+                    </div>
+                    <div id="modal-variants"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quantity limit popup: hot items are one-per-order -->
+    <div id="qty-popup" class="qty-popup" role="alertdialog" aria-modal="true" aria-labelledby="qty-popup-msg">
+        <div class="qty-popup__box">
+            <h3 id="qty-popup-msg">Only 1 available</h3>
+            <p id="qty-popup-sub">This item is limited to one per order.</p>
+            <button type="button" id="qty-popup-ok" class="qty-popup__ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Final Order Modal: DESIGNED FOR MOBILE FIT -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content invoice-style">
+            <span class="close-modal-btn" id="close-checkout" style="color: #000;">&times;</span>
+            <div style="border-bottom: 8px solid #000; padding-bottom: 15px; margin-bottom: 20px; text-align: center;">
+                <img src="logo.webp" alt="BOLTSCREWNAIL" class="logo-white-bg logo-invoice">
+                <h2 style="font-size: 1.5rem; font-weight: 950; letter-spacing: -1px;">ORDER SUMMARY</h2>
+                <span id="invoice-date-dynamic" style="font-weight: 950; font-size: 0.75rem;">DATE: —</span>
+            </div>
+            
+            <table class="invoice-items">
+                <thead><tr style="border-bottom: 3px solid #000;"><th style="padding: 10px 0;">PRODUCT</th><th style="text-align:center">QTY</th><th style="text-align:center">PRICE / BOX</th><th style="text-align:right">TOTAL</th></tr></thead>
+                <tbody id="invoice-tbody"></tbody>
+            </table>
+
+            <div class="invoice-totals">
+                <p style="font-size: 0.9rem;">SUBTOTAL: <span id="inv-subtotal">$0.00</span></p>
+                <div id="inv-loyalty-row" class="loyalty-text" style="display: none; font-size: 1rem; margin: 3px 0;">LOYALTY DISCOUNT: <span id="inv-loyalty-discount">-$0.00</span></div>
+                <p style="font-size: 0.9rem;">TAX (7%): <span id="inv-tax">$0.00</span></p>
+                <h3 style="font-size: 1.8rem; font-weight: 950; margin-top: 5px; border-bottom: 4px solid #000; display: inline-block;">TOTAL: <span id="inv-total">$0.00</span></h3>
+            </div>
+
+            <!-- Enhanced Order Form: MOBILE COLUMN FORCED -->
+            <form class="invoice-form" id="order-form" style="margin-top: 25px; border-top: 1px solid #ccc; padding-top: 20px;">
+                
+                <!-- Section 1 -->
+                <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 0.7rem; letter-spacing: 2px; color: #888; margin-bottom: 15px; font-weight: 950;">CUSTOMER INFORMATION</h4>
+                    <div class="form-grid-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="text" id="cust-name" placeholder="FULL NAME" required style="grid-column: span 2; padding: 12px; border: 1px solid #000;">
+                        <input type="text" id="cust-company" placeholder="COMPANY NAME" required style="padding: 12px; border: 1px solid #000;">
+                        <input type="email" id="cust-email" placeholder="EMAIL ADDRESS" required style="padding: 12px; border: 1px solid #000;">
+                        <input type="tel" id="customer-phone" placeholder="PHONE NUMBER (FOR DISCOUNT)" required style="grid-column: span 2; padding: 12px; border: 1px solid #000;">
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 0.7rem; letter-spacing: 2px; color: #888; margin-bottom: 15px; font-weight: 950;">DELIVERY INFORMATION</h4>
+                    <div class="form-grid-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <textarea id="delivery-address" placeholder="FULL DELIVERY ADDRESS" required style="grid-column: span 2; height: 60px; padding: 12px; border: 1px solid #000;"></textarea>
+                        <input type="text" id="delivery-contact" placeholder="PERSON OF CONTACT" required style="padding: 12px; border: 1px solid #000;">
+                        <input type="tel" id="delivery-phone" placeholder="DELIVERY PHONE" required style="padding: 12px; border: 1px solid #000;">
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div style="margin-bottom: 30px;">
+                    <h4 style="font-size: 0.7rem; letter-spacing: 2px; color: #888; margin-bottom: 15px; font-weight: 950;">ORDER CONFIRMATION & DELIVERY UPDATES</h4>
+                    <div class="confirmation-options-mobile" style="display: flex; gap: 20px; padding: 5px 0; flex-wrap: wrap;">
+                        <label style="font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.8rem;"><input type="radio" name="confirm_opt" value="call" required> PHONE CALL</label>
+                        <label style="font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.8rem;"><input type="radio" name="confirm_opt" value="text"> TEXT MESSAGE</label>
+                        <label style="font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.8rem;"><input type="radio" name="confirm_opt" value="email"> EMAIL</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="final-order-btn">ORDER</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="shop.js"></script>
+</body>
+</html>

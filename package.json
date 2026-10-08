@@ -1,0 +1,22 @@
+{
+  "name": "boltscrewnails",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "BOLTSCREWNAIL — weekend supplier, Raleigh NC. Static storefront + Vercel serverless backend.",
+  "scripts": {
+    "dev": "vercel dev",
+    "dev:local": "node --env-file=.env.local scripts/dev-server.mjs",
+    "build": "echo \"static + serverless, nothing to build\"",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "vercel": "^46.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
