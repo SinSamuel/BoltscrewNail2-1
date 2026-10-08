@@ -600,7 +600,7 @@ function buildInvoice() {
         const p = findProduct(pid);
         if (!p) return;
         let groupSum = 0;
-        tbody.innerHTML += `<tr class="inv-group"><td colspan="5">${p.name}</td></tr>`;
+        tbody.innerHTML += `<tr class="inv-group"><td colspan="5" style="color: #000000; font-weight: 950; font-size: 1rem; border-bottom: 2px solid #000; padding: 14px 0 6px;">${p.name}</td></tr>`;
         lines.forEach(l => {
             const v = findVariant(p, l.sku);
             if (!v) return;
@@ -616,7 +616,7 @@ function buildInvoice() {
                     <input type="number" min="1" value="${l.qty}" class="inv-qty-input" id="edit-qty-${pid}-${l.sku}">
                     <button type="button" class="inv-save-btn" onclick="updateInvoiceQty('${pid}','${l.sku}', document.getElementById('edit-qty-${pid}-${l.sku}').value)">SAVE</button>
                    </div>`
-                : `<b>${l.qty}</b>`;
+                : `<b style="color:#000000; font-size: 1rem;">${l.qty}</b>`;
 
             const editBtnText = isEditing ? 'CANCEL' : 'EDIT';
 
@@ -625,14 +625,12 @@ function buildInvoice() {
                     <button type="button" class="inv-act-btn" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editBtnText}</button>
                     <button type="button" class="inv-del-btn" onclick="deleteInvoiceLine('${pid}','${l.sku}')">DEL</button>
                 </td>
-                <td class="inv-spec">${variantLabel(v) || '—'}</td>
-                <td style="text-align:center">${qtyHtml}</td>
-                <td style="text-align:center">$${priceFor(p, v).toFixed(2)}</td>
-                <td style="text-align:right;font-weight:950;">$${lineTotal.toFixed(2)}</td>
+                <td class="inv-spec" style="color: #000000; font-weight: 800; font-size: 0.9rem;">${variantLabel(v) || '—'}</td>
+                <td style="text-align:center; color: #000000;">${qtyHtml}</td>
+                <td style="text-align:center; color: #000000; font-weight: 700;">$${priceFor(p, v).toFixed(2)}</td>
+                <td style="text-align:right; font-weight:950; color: #000000;">$${lineTotal.toFixed(2)}</td>
             </tr>`;
         });
-        tbody.innerHTML += `<tr class="inv-sub"><td colspan="4">Section subtotal</td>
-            <td style="text-align:right;">$${groupSum.toFixed(2)}</td></tr>`;
     });
 
     const phone = document.getElementById('customer-phone').value.trim();
