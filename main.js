@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mUses.textContent = d.uses;
         mRows.innerHTML = d.rows.map(r =>
             `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+        modal.style.display = 'block';
         modal.classList.add('open');
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
@@ -204,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function closeDetail() {
+        modal.style.display = 'none';
         modal.classList.remove('open');
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
