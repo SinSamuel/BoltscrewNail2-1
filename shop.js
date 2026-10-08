@@ -547,8 +547,44 @@ window.addFromModal = function (pid) {
 
 /* ------------------------------------------------------------------
    Invoice - grouped by product so several sizes of one nail read as
-   one item rather than unrelated rows.
+   one item rather than unrelated rows. Includes live Edit & Delete actions.
    ------------------------------------------------------------------ */
+let editingLineKey = null;
+
+window.toggleEditInvoiceLine = function(pid, sku) {
+    const key = `${pid}_${sku}`;
+    editingLineKey = (editingLineKey === key) ? null : key;
+    buildInvoice();
+};
+
+window.updateInvoiceQty = function(pid, sku, val) {
+    const n = parseInt(val, 10);
+    if (!Number.isFinite(n) || n <= 0) return;
+    const p = findProduct(pid);
+    const v = p && findVariant(p, sku);
+    let qty = n;
+    if (p && isOneOnly(p) && qty > 1) {
+        qty = 1;
+        window.showQtyLimitPopup(p.name);
+    } else if (v && v.stock != null && qty > v.stock) {
+        qty = v.stock;
+        window.showQtyLimitPopup(p ? p.name : '', 'Only ' + v.stock + ' in stock — quantity adjusted.');
+    }
+    setLineQty(pid, sku, qty);
+    editingLineKey = null;
+    buildInvoice();
+};
+
+window.deleteInvoiceLine = function(pid, sku) {
+    orderLines = orderLines.filter(l => !(l.pid === pid && l.sku === sku));
+    refreshTotals();
+    if (orderLines.length === 0) {
+        dismissOverlay();
+    } else {
+        buildInvoice();
+    }
+};
+
 function buildInvoice() {
     const tbody = document.getElementById('invoice-tbody');
     tbody.innerHTML = '';
@@ -564,21 +600,38 @@ function buildInvoice() {
         const p = findProduct(pid);
         if (!p) return;
         let groupSum = 0;
-        tbody.innerHTML += `<tr class="inv-group"><td colspan="4">${p.name}</td></tr>`;
+        tbody.innerHTML += `<tr class="inv-group"><td colspan="5">${p.name}</td></tr>`;
         lines.forEach(l => {
             const v = findVariant(p, l.sku);
             if (!v) return;
             const lineTotal = priceFor(p, v) * l.qty;
             subtotal += lineTotal;
             groupSum += lineTotal;
+
+            const key = `${pid}_${l.sku}`;
+            const isEditing = (editingLineKey === key);
+
+            const qtyHtml = isEditing
+                ? `<div class="inv-qty-edit-wrap">
+                    <input type="number" min="1" value="${l.qty}" class="inv-qty-input" id="edit-qty-${pid}-${l.sku}">
+                    <button type="button" class="inv-save-btn" onclick="updateInvoiceQty('${pid}','${l.sku}', document.getElementById('edit-qty-${pid}-${l.sku}').value)">SAVE</button>
+                   </div>`
+                : `<b>${l.qty}</b>`;
+
+            const editBtnText = isEditing ? 'CANCEL' : 'EDIT';
+
             tbody.innerHTML += `<tr>
+                <td style="padding: 6px 0; white-space: nowrap;">
+                    <button type="button" class="inv-act-btn" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editBtnText}</button>
+                    <button type="button" class="inv-del-btn" onclick="deleteInvoiceLine('${pid}','${l.sku}')">DEL</button>
+                </td>
                 <td class="inv-spec">${variantLabel(v) || '—'}</td>
-                <td style="text-align:center">${l.qty}</td>
+                <td style="text-align:center">${qtyHtml}</td>
                 <td style="text-align:center">$${priceFor(p, v).toFixed(2)}</td>
                 <td style="text-align:right;font-weight:950;">$${lineTotal.toFixed(2)}</td>
             </tr>`;
         });
-        tbody.innerHTML += `<tr class="inv-sub"><td colspan="3">Section subtotal</td>
+        tbody.innerHTML += `<tr class="inv-sub"><td colspan="4">Section subtotal</td>
             <td style="text-align:right;">$${groupSum.toFixed(2)}</td></tr>`;
     });
 
