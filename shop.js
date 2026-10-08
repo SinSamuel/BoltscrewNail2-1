@@ -196,15 +196,27 @@ function ensureCatalogSections() {
 function cleanEmptySections() {
     document.querySelectorAll('.sub-section-anchor').forEach(a => {
         const grid = a.querySelector('.product-grid');
-        if (!grid || !grid.children.length) a.style.display = 'none';
+        if (grid && grid.children.length > 0) {
+            a.style.display = 'block';
+        } else {
+            a.style.display = 'none';
+        }
     });
     document.querySelectorAll('.main-cat-section').forEach(sec => {
-        if (!sec.querySelector('.product-card')) sec.style.display = 'none';
+        if (sec.querySelector('.product-card')) {
+            sec.style.display = 'block';
+        } else {
+            sec.style.display = 'none';
+        }
     });
     document.querySelectorAll('.nav-main-link').forEach(link => {
         const target = link.getAttribute('href').slice(1);
         const sec = document.getElementById(target);
-        if (!sec || getComputedStyle(sec).display === 'none') link.style.display = 'none';
+        if (!sec || getComputedStyle(sec).display === 'none') {
+            link.style.display = 'none';
+        } else {
+            link.style.display = 'inline-block';
+        }
     });
 }
 
