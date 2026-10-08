@@ -22,7 +22,7 @@ const loyaltyDB = { "1": { name: "Sam", discount: 0.20 } };
 /* Elements the handlers below need. Assigned in the boot block at the
    bottom - they are declared here because openProductDetail and friends
    are top-level functions, not inside that callback. */
-let productModal, checkoutModal, brandLink;
+let productModal, checkoutModal, brandLink, navLogoCenter;
 
 let orderLines = [];   // { pid, sku, qty }
 let selectedVariant = null;   // variant highlighted in the detail modal
@@ -111,14 +111,18 @@ function restoreCardInputs() {
 
 function refreshTotals() {
     const total = orderSubtotal();
+    const hasItems = orderLines.length > 0;
     if (brandLink) {
-        if (orderLines.length) {
+        if (hasItems) {
             brandLink.innerText = `TOTAL: $${total.toFixed(2)}`;
             brandLink.style.color = '#fff';
         } else {
             brandLink.innerText = 'BOLTSCREWNAIL';
             brandLink.style.color = '';
         }
+    }
+    if (navLogoCenter) {
+        navLogoCenter.classList.toggle('nav-logo-visible', hasItems);
     }
     document.querySelectorAll('[data-lines-for]').forEach(renderLines);
     if (checkoutModal && checkoutModal.style.display === 'block') buildInvoice();
@@ -599,33 +603,35 @@ function buildInvoice() {
     byProduct.forEach((lines, pid) => {
         const p = findProduct(pid);
         if (!p) return;
-        let groupSum = 0;
-        tbody.innerHTML += `<tr class="inv-group"><td colspan="5" style="color: #000000; font-weight: 950; font-size: 1rem; border-bottom: 2px solid #000; padding: 14px 0 6px;">${p.name}</td></tr>`;
         lines.forEach(l => {
             const v = findVariant(p, l.sku);
             if (!v) return;
             const lineTotal = priceFor(p, v) * l.qty;
             subtotal += lineTotal;
-            groupSum += lineTotal;
 
             const key = `${pid}_${l.sku}`;
             const isEditing = (editingLineKey === key);
 
+            // Build one compact label: product name + variant spec, truncated
+            const vLabel = variantLabel(v);
+            const fullLabel = vLabel ? `${p.name} · ${vLabel}` : p.name;
+            const truncLabel = fullLabel.length > 38 ? fullLabel.slice(0, 36) + '…' : fullLabel;
+
             const qtyHtml = isEditing
                 ? `<div class="inv-qty-edit-wrap">
                     <input type="number" min="1" value="${l.qty}" class="inv-qty-input" id="edit-qty-${pid}-${l.sku}">
-                    <button type="button" class="inv-save-btn" onclick="updateInvoiceQty('${pid}','${l.sku}', document.getElementById('edit-qty-${pid}-${l.sku}').value)">SAVE</button>
+                    <button type="button" class="inv-save-btn" onclick="updateInvoiceQty('${pid}','${l.sku}', document.getElementById('edit-qty-${pid}-${l.sku}').value)">&#10003;</button>
                    </div>`
                 : `<b style="color:#000000; font-size: 1rem;">${l.qty}</b>`;
 
-            const editBtnText = isEditing ? 'CANCEL' : 'EDIT';
+            const editIcon = isEditing ? '&#10005;' : '&#9998;';  // ✕ or ✎
 
-            tbody.innerHTML += `<tr>
-                <td style="padding: 6px 0; white-space: nowrap;">
-                    <button type="button" class="inv-act-btn" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editBtnText}</button>
-                    <button type="button" class="inv-del-btn" onclick="deleteInvoiceLine('${pid}','${l.sku}')">DEL</button>
+            tbody.innerHTML += `<tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 6px 4px; white-space: nowrap;">
+                    <button type="button" class="inv-icon-btn inv-edit-icon" title="Edit quantity" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editIcon}</button>
+                    <button type="button" class="inv-icon-btn inv-del-icon" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">&#128465;</button>
                 </td>
-                <td class="inv-spec" style="color: #000000; font-weight: 800; font-size: 0.9rem;">${variantLabel(v) || '—'}</td>
+                <td class="inv-spec" style="color: #000000; font-weight: 800; font-size: 0.85rem; max-width: 160px;" title="${fullLabel}">${truncLabel}</td>
                 <td style="text-align:center; color: #000000;">${qtyHtml}</td>
                 <td style="text-align:center; color: #000000; font-weight: 700;">$${priceFor(p, v).toFixed(2)}</td>
                 <td style="text-align:right; font-weight:950; color: #000000;">$${lineTotal.toFixed(2)}</td>
@@ -676,7 +682,8 @@ const triggerCheckout = (e) => {
 document.addEventListener('DOMContentLoaded', async () => {
     productModal = document.getElementById('product-modal');
     checkoutModal = document.getElementById('checkout-modal');
-    brandLink = document.querySelector('.nav-brand-link');
+    brandLink = document.getElementById('nav-brand');
+    navLogoCenter = document.getElementById('nav-logo-center');
     const dynamicSubLinks = document.getElementById('dynamic-sub-links');
     const mainSections = document.querySelectorAll('.main-cat-section');
     const subNav = document.getElementById('sub-nav-bar');

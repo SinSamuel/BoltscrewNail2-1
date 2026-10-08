@@ -16,8 +16,32 @@ body.shop-page {
 
 /* Nav */
 .shop-nav-special { background: #000; border-bottom: 3px solid var(--metal-mid); position: sticky; top: 0; z-index: 2000; height: 60px; display: flex; align-items: center; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-.nav-container { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+.nav-container { width: 100%; max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; position: relative; }
 .nav-brand-link { font-size: 1.1rem; font-weight: 950; text-decoration: none; color: #fff; letter-spacing: -1px; }
+
+.nav-logo-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+}
+.nav-logo-center.nav-logo-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+.nav-logo-img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
 
 /* Sub-Nav System */
 .sub-nav-system { position: sticky; top: 60px; background: #000; border-bottom: 2px solid var(--metal-white); z-index: 1000; padding: 10px 0; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), top 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -170,42 +194,39 @@ tr.inv-sub td {
     text-transform: uppercase; letter-spacing: 1px; font-weight: 800;
 }
 
-/* Invoice Action Buttons & Inputs */
-.inv-act-btn {
-    background: #000000;
-    color: #ffffff;
-    border: none;
-    padding: 4px 8px;
-    font-size: 0.7rem;
-    font-weight: 950;
+/* Invoice Icon Buttons */
+.inv-icon-btn {
+    background: none;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 1rem;
     cursor: pointer;
-    margin-right: 4px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    line-height: 1;
+    transition: background 0.15s ease;
+    margin-right: 3px;
 }
-.inv-act-btn:hover {
-    background: #333333;
+.inv-edit-icon {
+    color: #1d4ed8;
 }
-.inv-del-btn {
-    background: #b91c1c;
-    color: #ffffff;
-    border: none;
-    padding: 4px 8px;
-    font-size: 0.7rem;
-    font-weight: 950;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+.inv-edit-icon:hover {
+    background: #dbeafe;
+    border-color: #1d4ed8;
 }
-.inv-del-btn:hover {
-    background: #991b1b;
+.inv-del-icon {
+    color: #b91c1c;
+}
+.inv-del-icon:hover {
+    background: #fee2e2;
+    border-color: #b91c1c;
 }
 .inv-save-btn {
     background: #15803d;
     color: #ffffff;
     border: none;
-    padding: 4px 8px;
-    font-size: 0.7rem;
+    border-radius: 4px;
+    padding: 3px 7px;
+    font-size: 1rem;
     font-weight: 950;
     cursor: pointer;
     margin-left: 4px;
