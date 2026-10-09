@@ -108,6 +108,18 @@ body.shop-page {
     }
     .nav-brand-link { font-size: 0.95rem; }
     .final-order-btn { font-size: 1rem; padding: 15px; letter-spacing: 2px; }
+
+    /* ---- MOBILE NAV OVERLAP FIX ---- */
+    .nav-logo-center { height: 24px; max-width: 60px; }
+    .nav-logo-img { max-width: 100%; }
+    .cta-btn.small-btn { padding: 7px 10px; font-size: 0.68rem; white-space: nowrap; }
+}
+
+/* Phones ≤ 480px — hide center logo entirely to prevent overlap with CTA */
+@media (max-width: 480px) {
+    .nav-logo-center { display: none !important; }
+    .nav-brand-link { font-size: 0.82rem; }
+    .cta-btn.small-btn { padding: 7px 10px; font-size: 0.65rem; }
 }
 
 .main-category-title { font-size: 3rem; font-weight: 950; text-transform: uppercase; margin-bottom: 15px; border-bottom: 8px solid #fff; display: inline-block; }
