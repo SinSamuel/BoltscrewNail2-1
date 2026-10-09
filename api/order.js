@@ -1,4 +1,5 @@
 import { getStripe } from '../lib/stripe.js';
+import { sendOrderNotifications } from '../lib/notifications.js';
 
 /**
  * POST /api/order
@@ -79,9 +80,11 @@ export default async function handler(req, res) {
         if ((meta.cat === 'limited' || meta.cat === 'specials') && requested > 1) {
             shortItems.push({ priceId: line.priceId, requested, available: 1 });
         }
+        const itemName = product ? (product.name || 'Fastener Stock') : 'Fastener Stock';
         lineInfo.push({
             priceId: line.priceId,
             productId: product ? product.id : null,
+            name: itemName,
             qty: requested,
             unit: price.unit_amount || 0
         });
@@ -151,6 +154,25 @@ export default async function handler(req, res) {
             description: `NC SALES TAX (${TAX_PERCENT}%) — ${TAX_LOCATION}`
         });
     }
+
+    // Trigger instant notifications (Discord/Telegram push + Resend email)
+    const orderItems = lineInfo.map(l => ({
+        name: l.name,
+        qty: l.qty,
+        unit: l.unit / 100,
+        total: (l.unit * l.qty) / 100
+    }));
+
+    sendOrderNotifications({
+        invoiceId: invoice.id,
+        customer,
+        delivery,
+        confirm,
+        items: orderItems,
+        subtotal: subtotalCents / 100,
+        tax: taxCents / 100,
+        total: (subtotalCents + taxCents) / 100
+    }).catch(err => console.error('[order] Notification dispatch error:', err));
 
     return res.status(200).json({
         invoiceId: invoice.id,
