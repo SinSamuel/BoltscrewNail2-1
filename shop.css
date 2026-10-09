@@ -119,18 +119,20 @@ body.shop-page {
     .final-order-btn { font-size: 1rem; padding: 15px; letter-spacing: 2px; }
 
     /* ---- MOBILE NAV REFINEMENTS ---- */
-    .nav-container { padding: 0 12px; }
-    .nav-brand-logo { height: 26px; }
-    .nav-total-center { font-size: 0.82rem; }
-    .cta-btn.small-btn { padding: 6px 10px; font-size: 0.68rem; white-space: nowrap; }
+    .nav-container { padding: 0 14px; }
+    .nav-brand-logo { height: 88%; }
+    .nav-logo-img { max-height: 50px; }
+    .nav-total-center { font-size: 0.95rem; }
+    .cta-btn.small-btn { padding: 8px 12px; font-size: 0.78rem; white-space: nowrap; }
 }
 
 /* Very narrow phones (≤ 380px) */
 @media (max-width: 380px) {
-    .nav-container { padding: 0 8px; }
-    .nav-brand-logo { height: 22px; }
-    .nav-total-center { font-size: 0.72rem; }
-    .cta-btn.small-btn { padding: 5px 8px; font-size: 0.6rem; }
+    .nav-container { padding: 0 10px; }
+    .nav-brand-logo { height: 84%; }
+    .nav-logo-img { max-height: 46px; }
+    .nav-total-center { font-size: 0.88rem; }
+    .cta-btn.small-btn { padding: 7px 10px; font-size: 0.72rem; }
 }
 
 .main-category-title { font-size: 3rem; font-weight: 950; text-transform: uppercase; margin-bottom: 15px; border-bottom: 8px solid #fff; display: inline-block; }
