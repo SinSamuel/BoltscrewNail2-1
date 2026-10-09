@@ -115,10 +115,21 @@ body.shop-page {
     .cta-btn.small-btn { padding: 7px 10px; font-size: 0.68rem; white-space: nowrap; }
 }
 
-/* Phones ≤ 480px — hide center logo entirely to prevent overlap with CTA */
+/* Phones ≤ 480px — swap brand text for logo on the left to prevent overlap */
 @media (max-width: 480px) {
-    .nav-logo-center { display: none !important; }
-    .nav-brand-link { font-size: 0.82rem; }
+    /* Hide the text, show the logo in-flow on the left */
+    .nav-brand-link { display: none !important; }
+    .nav-logo-center {
+        position: static !important;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        height: 28px;
+        max-width: none;
+    }
+    .nav-logo-center.nav-logo-visible {
+        transform: none !important;
+    }
     .cta-btn.small-btn { padding: 7px 10px; font-size: 0.65rem; }
 }
 
