@@ -114,8 +114,13 @@ let navTotalCenter, completeOrderBtn;
 function refreshTotals() {
     const total = orderSubtotal();
     const hasItems = orderLines.length > 0;
+    if (!brandLink) brandLink = document.getElementById('nav-brand');
     if (!navTotalCenter) navTotalCenter = document.getElementById('nav-total-center');
     if (!completeOrderBtn) completeOrderBtn = document.getElementById('complete-order');
+
+    if (brandLink) {
+        brandLink.classList.toggle('logo-centered', !hasItems);
+    }
 
     if (navTotalCenter) {
         if (hasItems) {
