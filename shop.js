@@ -109,20 +109,25 @@ function restoreCardInputs() {
     });
 }
 
+let navTotalCenter, completeOrderBtn;
+
 function refreshTotals() {
     const total = orderSubtotal();
     const hasItems = orderLines.length > 0;
-    if (brandLink) {
+    if (!navTotalCenter) navTotalCenter = document.getElementById('nav-total-center');
+    if (!completeOrderBtn) completeOrderBtn = document.getElementById('complete-order');
+
+    if (navTotalCenter) {
         if (hasItems) {
-            brandLink.innerText = `TOTAL: $${total.toFixed(2)}`;
-            brandLink.style.color = '#fff';
+            navTotalCenter.innerText = `TOTAL: $${total.toFixed(2)}`;
+            navTotalCenter.style.display = 'block';
         } else {
-            brandLink.innerText = 'BOLTSCREWNAIL';
-            brandLink.style.color = '';
+            navTotalCenter.innerText = '';
+            navTotalCenter.style.display = 'none';
         }
     }
-    if (navLogoCenter) {
-        navLogoCenter.classList.toggle('nav-logo-visible', hasItems);
+    if (completeOrderBtn) {
+        completeOrderBtn.style.display = hasItems ? 'inline-block' : 'none';
     }
     document.querySelectorAll('[data-lines-for]').forEach(renderLines);
     if (checkoutModal && checkoutModal.style.display === 'block') buildInvoice();
