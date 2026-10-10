@@ -9,8 +9,8 @@
     <title>ORDER HUB | BOLTSCREWNAIL</title>
     <!-- Sharp Professional Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4">
-    <link rel="stylesheet" href="shop.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="shop.css?v=5">
 
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-93H8CZMND6"></script>
@@ -23,8 +23,8 @@
 </head>
 <body class="shop-page">
 
-    <!-- Primary Conversion Nav -->
-    <nav id="main-nav" class="shop-nav-special visible">
+    <!-- Primary Conversion Nav (Hidden until customer adds item) -->
+    <nav id="main-nav" class="shop-nav-special" style="display: none;">
         <div class="nav-container">
             <a href="index.html" class="nav-brand-logo logo-centered" id="nav-brand" aria-label="Back to home">
                 <img src="logo.webp" alt="BoltScrewNail" class="nav-logo-img">
@@ -35,7 +35,7 @@
     </nav>
 
     <!-- Intelligent Sub-Navigation System -->
-    <div id="sub-nav-bar" class="sub-nav-system">
+    <div id="sub-nav-bar" class="sub-nav-system" style="top: 0px;">
         <div class="sub-nav-container">
             <div class="main-cat-links">
                 <a href="#section-bolts" class="nav-main-link" data-target="bolts">BOLTS</a>
@@ -122,10 +122,12 @@
                 <span id="invoice-date-dynamic" style="font-weight: 950; font-size: 0.75rem;">DATE: —</span>
             </div>
             
-            <table class="invoice-items">
-                <thead><tr style="border-bottom: 3px solid #000;"><th style="padding: 10px 0; text-align: left;">ACTION</th><th style="padding: 10px 0;">PRODUCT</th><th style="text-align:center">QTY</th><th style="text-align:center">PRICE / BOX</th><th style="text-align:right">TOTAL</th></tr></thead>
-                <tbody id="invoice-tbody"></tbody>
-            </table>
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; margin-top: 15px;">
+                <table class="invoice-items" style="margin-top: 0;">
+                    <thead><tr style="border-bottom: 3px solid #000;"><th style="padding: 10px 0; text-align: left;">ACTION</th><th style="padding: 10px 0;">PRODUCT</th><th style="text-align:center">QTY</th><th style="text-align:center">PRICE / BOX</th><th style="text-align:right">TOTAL</th></tr></thead>
+                    <tbody id="invoice-tbody"></tbody>
+                </table>
+            </div>
 
             <div class="invoice-totals">
                 <p style="font-size: 0.9rem;">SUBTOTAL: <span id="inv-subtotal">$0.00</span></p>
@@ -173,6 +175,6 @@
         </div>
     </div>
 
-    <script src="shop.js?v=4"></script>
+    <script src="shop.js?v=5"></script>
 </body>
 </html>

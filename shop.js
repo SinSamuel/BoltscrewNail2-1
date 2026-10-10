@@ -114,9 +114,19 @@ let navTotalCenter, completeOrderBtn;
 function refreshTotals() {
     const total = orderSubtotal();
     const hasItems = orderLines.length > 0;
+    const mainNav = document.getElementById('main-nav');
+    const subNav = document.getElementById('sub-nav-bar');
+
     if (!brandLink) brandLink = document.getElementById('nav-brand');
     if (!navTotalCenter) navTotalCenter = document.getElementById('nav-total-center');
     if (!completeOrderBtn) completeOrderBtn = document.getElementById('complete-order');
+
+    if (mainNav) {
+        mainNav.style.display = hasItems ? 'flex' : 'none';
+    }
+    if (subNav) {
+        subNav.style.top = hasItems ? '60px' : '0px';
+    }
 
     if (brandLink) {
         brandLink.classList.toggle('logo-centered', !hasItems);
@@ -134,6 +144,10 @@ function refreshTotals() {
     if (completeOrderBtn) {
         completeOrderBtn.style.display = hasItems ? 'inline-block' : 'none';
     }
+
+    // Keep all product card inputs in sync with current orderLines state
+    restoreCardInputs();
+
     document.querySelectorAll('[data-lines-for]').forEach(renderLines);
     if (checkoutModal && checkoutModal.style.display === 'block') buildInvoice();
     saveCart();
@@ -634,12 +648,12 @@ function buildInvoice() {
                    </div>`
                 : `<b style="color:#000000; font-size: 1rem;">${l.qty}</b>`;
 
-            const editIcon = isEditing ? '&#10005;' : '&#9998;';  // ✕ or ✎
+            const editBadgeText = isEditing ? '[CANCEL]' : '[EDIT]';
 
             tbody.innerHTML += `<tr style="border-bottom: 1px solid #e5e7eb;">
                 <td style="padding: 6px 4px; white-space: nowrap;">
-                    <button type="button" class="inv-icon-btn inv-edit-icon" title="Edit quantity" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editIcon}</button>
-                    <button type="button" class="inv-icon-btn inv-del-icon" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">&#128465;</button>
+                    <button type="button" class="inv-badge-btn inv-edit-badge" title="${isEditing ? 'Cancel editing' : 'Edit quantity'}" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editBadgeText}</button>
+                    <button type="button" class="inv-badge-btn inv-del-badge" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">[DELETE]</button>
                 </td>
                 <td class="inv-spec" style="color: #000000; font-weight: 800; font-size: 0.85rem; max-width: 160px;" title="${fullLabel}">${truncLabel}</td>
                 <td style="text-align:center; color: #000000;">${qtyHtml}</td>
@@ -717,6 +731,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     ensureCatalogSections();
     products.forEach(renderCard);
     cleanEmptySections();
+    loadCart();
+    restoreCardInputs();
     refreshTotals();
 
     window.addEventListener('scroll', () => {
@@ -735,8 +751,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.nav-sub-link').forEach(link => {
             link.classList.toggle('active', link.getAttribute('href') === `#${currentSubId}`);
         });
-        if (mainNav) mainNav.style.transform = 'translateY(0)';
-        if (subNav) subNav.style.top = '60px';
+        const hasItems = orderLines.length > 0;
+        if (mainNav) mainNav.style.display = hasItems ? 'flex' : 'none';
+        if (subNav) subNav.style.top = hasItems ? '60px' : '0px';
     });
 
     function updateSubNav(cat) {
@@ -881,8 +898,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.key === 'ArrowLeft') { e.preventDefault(); galleryGo(gallery.index - 1); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); galleryGo(gallery.index + 1); }
     });
-
-    loadCart();
-    restoreCardInputs();
-    refreshTotals();
 });
