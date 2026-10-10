@@ -667,6 +667,11 @@ function buildInvoice() {
             const fullLabel = vLabel ? `${p.name} · ${vLabel}` : p.name;
             const truncLabel = fullLabel.length > 38 ? fullLabel.slice(0, 36) + '…' : fullLabel;
 
+            // SVG icons — pencil (blue=edit), X (green=cancel), trash (red=delete)
+            const iconEdit   = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+            const iconCancel = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+            const iconTrash  = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+
             const qtyHtml = isEditing
                 ? `<div class="inv-qty-edit-wrap">
                     <input type="number" min="1" value="${l.qty}" class="inv-qty-input" id="edit-qty-${pid}-${l.sku}">
@@ -674,12 +679,10 @@ function buildInvoice() {
                    </div>`
                 : `<b style="color:#000000; font-size: 1rem;">${l.qty}</b>`;
 
-            const editBadgeText = isEditing ? 'CANCEL' : 'EDIT';
-
             tbody.innerHTML += `<tr style="border-bottom: 1px solid #e5e7eb;">
                 <td style="padding: 6px 4px; white-space: nowrap;">
-                    <button type="button" class="inv-badge-btn inv-edit-badge" title="${isEditing ? 'Cancel editing' : 'Edit quantity'}" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editBadgeText}</button>
-                    <button type="button" class="inv-badge-btn inv-del-badge" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">DELETE</button>
+                    <button type="button" class="inv-badge-btn inv-edit-badge" title="${isEditing ? 'Cancel editing' : 'Edit quantity'}" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${isEditing ? iconCancel : iconEdit}</button>
+                    <button type="button" class="inv-badge-btn inv-del-badge" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">${iconTrash}</button>
                 </td>
                 <td class="inv-spec" style="color: #000000; font-weight: 800; font-size: 0.85rem; max-width: 160px;" title="${fullLabel}">${truncLabel}</td>
                 <td style="text-align:center; color: #000000;">${qtyHtml}</td>
@@ -733,7 +736,7 @@ function buildInvoice() {
         if (volRow) {
             if (volPercent > 0) {
                 volRow.style.display = 'flex';
-                document.getElementById('inv-vol-label').innerText = `VOLUME DISCOUNT (${volPercent}% ON $${thousands}K+):`;
+                document.getElementById('inv-vol-label').innerText = 'VOLUME DISCOUNT:';
                 document.getElementById('inv-vol-amt').innerText = `-$${volAmount.toFixed(2)}`;
             } else {
                 volRow.style.display = 'none';
@@ -743,7 +746,7 @@ function buildInvoice() {
         if (palRow) {
             if (palletDiscount > 0) {
                 palRow.style.display = 'flex';
-                document.getElementById('inv-pal-label').innerText = `FULL PALLET DISCOUNT (5% ON ${palletBoxesCount} BXS):`;
+                document.getElementById('inv-pal-label').innerText = 'PALLET DISCOUNT:';
                 document.getElementById('inv-pal-amt').innerText = `-$${palletDiscount.toFixed(2)}`;
             } else {
                 palRow.style.display = 'none';
@@ -753,7 +756,7 @@ function buildInvoice() {
         if (loyRow) {
             if (loyaltyPercent > 0) {
                 loyRow.style.display = 'flex';
-                document.getElementById('inv-loy-label').innerText = currentLoyalty.badge || `CONTRACTOR LOYALTY (${loyaltyPercent}%):`;
+                document.getElementById('inv-loy-label').innerText = 'CONTRACTOR DISCOUNT:';
                 document.getElementById('inv-loy-amt').innerText = `-$${loyaltyAmount.toFixed(2)}`;
             } else {
                 loyRow.style.display = 'none';

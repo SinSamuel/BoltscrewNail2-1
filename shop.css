@@ -228,21 +228,19 @@ tr.inv-sub td {
     text-transform: uppercase; letter-spacing: 1px; font-weight: 800;
 }
 
-/* Invoice Action Badges */
+/* Invoice Action Badges — icon-only circular buttons */
 .inv-badge-btn {
-    background: transparent;
-    font-family: inherit;
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    padding: 4px 6px;
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
     cursor: pointer;
-    line-height: 1.2;
     transition: all 0.15s ease;
-    display: inline-block;
-    text-transform: uppercase;
     vertical-align: middle;
+    flex-shrink: 0;
 }
 .inv-edit-badge {
     color: #1d4ed8;
@@ -263,6 +261,7 @@ tr.inv-sub td {
     background: #dc2626;
     color: #ffffff;
 }
+
 
 /* Invoice Icon Buttons (legacy fallback) */
 .inv-icon-btn {
