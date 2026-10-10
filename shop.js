@@ -9,7 +9,7 @@ let products = [];   // built by buildProducts() from /api/products
 
 const subSections = {
     'bolts': [{ id: 'sub-bolts-structural', name: 'STRUCTURAL' }, { id: 'sub-bolts-anchor', name: 'ANCHOR' }, { id: 'sub-bolts-specialty', name: 'SPECIALTY' }],
-    'screws': [{ id: 'sub-screws-construction', name: 'CONSTRUCTION' }, { id: 'sub-screws-interior', name: 'INTERIOR' }, { id: 'sub-screws-masonry', name: 'MASONRY' }],
+    'screws': [{ id: 'sub-screws-construction', name: 'CONSTRUCTION' }, { id: 'sub-screws-deck', name: 'DECK' }, { id: 'sub-screws-interior', name: 'INTERIOR' }, { id: 'sub-screws-masonry', name: 'MASONRY' }],
     'nails': [{ id: 'sub-nails-strip', name: 'STRIP' }, { id: 'sub-nails-coil', name: 'COIL' }, { id: 'sub-nails-finish', name: 'FINISH' }, { id: 'sub-nails-bulk', name: 'BULK' }, { id: 'sub-nails-staples', name: 'STAPLES' }],
     'limited': [{ id: 'sub-limited-power-tools', name: 'POWER TOOLS' }, { id: 'sub-limited-lots', name: 'LOTS' }]
 };
