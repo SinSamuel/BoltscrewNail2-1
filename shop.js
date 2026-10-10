@@ -648,12 +648,12 @@ function buildInvoice() {
                    </div>`
                 : `<b style="color:#000000; font-size: 1rem;">${l.qty}</b>`;
 
-            const editBadgeText = isEditing ? '[CANCEL]' : '[EDIT]';
+            const editBadgeText = isEditing ? 'CANCEL' : 'EDIT';
 
             tbody.innerHTML += `<tr style="border-bottom: 1px solid #e5e7eb;">
                 <td style="padding: 6px 4px; white-space: nowrap;">
                     <button type="button" class="inv-badge-btn inv-edit-badge" title="${isEditing ? 'Cancel editing' : 'Edit quantity'}" onclick="toggleEditInvoiceLine('${pid}','${l.sku}')">${editBadgeText}</button>
-                    <button type="button" class="inv-badge-btn inv-del-badge" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">[DELETE]</button>
+                    <button type="button" class="inv-badge-btn inv-del-badge" title="Remove item" onclick="deleteInvoiceLine('${pid}','${l.sku}')">DELETE</button>
                 </td>
                 <td class="inv-spec" style="color: #000000; font-weight: 800; font-size: 0.85rem; max-width: 160px;" title="${fullLabel}">${truncLabel}</td>
                 <td style="text-align:center; color: #000000;">${qtyHtml}</td>
@@ -774,6 +774,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('complete-order').onclick = triggerCheckout;
+
+    const phoneInp = document.getElementById('customer-phone');
+    if (phoneInp) phoneInp.addEventListener('input', buildInvoice);
 
     /* Order submission — POST /api/order, then a success screen. Stripe
        creates a DRAFT invoice; payment happens off-site when the shop
