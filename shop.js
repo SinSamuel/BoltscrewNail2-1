@@ -307,13 +307,11 @@ function renderCard(p) {
         </div>
         ${many ? `
             <div class="vsize-note">${p.variants.length} sizes available</div>
-            ${p.cat === 'nails' ? `<div class="vsize-note" style="color: #16a34a; font-weight: 800;">46+ BOXES = 5% PALLET SAVINGS</div>` : ''}
             ${stockHtml}
             <div class="vlines" data-lines-for="${p.id}"></div>
             <button type="button" class="vadd" onclick="openProductDetail('${p.id}')">+ ADD SIZE</button>
         ` : `
             ${p.cat === 'limited' || p.variants.length <= SIMPLE_MAX ? `<div class="product-price" data-price-for="${p.id}"></div>` : ''}
-            ${p.cat === 'nails' ? `<div class="vsize-note" style="color: #16a34a; font-weight: 800;">46+ BOXES = 5% PALLET SAVINGS</div>` : ''}
             ${stockHtml}
             <div class="qty-wrapper"><input type="number" value="0" min="0" ${p.cat === 'limited' ? 'max="1"' : ''} class="qty-input"
                 onfocus="clearZero(this)" aria-label="Quantity of boxes"
