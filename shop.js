@@ -14,7 +14,33 @@ const subSections = {
     'limited': [{ id: 'sub-limited-power-tools', name: 'POWER TOOLS' }, { id: 'sub-limited-lots', name: 'LOTS' }]
 };
 
-const loyaltyDB = { "1": { name: "Sam", discount: 0.20 } };
+const PALLET_BOXES = 46;
+let currentLoyalty = { tier: null, percent: 0, badge: null, spend60d: 0, isTest: false };
+let loyaltyTimer = null;
+
+function fetchLoyalty(phoneVal) {
+    clearTimeout(loyaltyTimer);
+    const clean = String(phoneVal || '').replace(/\D/g, '');
+    if (!clean || clean.length < 7) {
+        currentLoyalty = { tier: null, percent: 0, badge: null, spend60d: 0, isTest: false };
+        buildInvoice();
+        return;
+    }
+    loyaltyTimer = setTimeout(async () => {
+        try {
+            const res = await fetch(`/api/loyalty?phone=${encodeURIComponent(clean)}`);
+            const data = await res.json();
+            if (data && data.found && data.percent > 0) {
+                currentLoyalty = data;
+            } else {
+                currentLoyalty = { tier: null, percent: 0, badge: null, spend60d: 0, isTest: false };
+            }
+        } catch {
+            currentLoyalty = { tier: null, percent: 0, badge: null, spend60d: 0, isTest: false };
+        }
+        buildInvoice();
+    }, 200);
+}
 /* ------------------------------------------------------------------
    Order state. A line is (product, variant, quantity) - so one card can
    hold several sizes of the same nail, which is the whole point.
@@ -281,11 +307,13 @@ function renderCard(p) {
         </div>
         ${many ? `
             <div class="vsize-note">${p.variants.length} sizes available</div>
+            ${p.cat === 'nails' ? `<div class="vsize-note" style="color: #16a34a; font-weight: 800;">46+ BOXES = 5% PALLET SAVINGS</div>` : ''}
             ${stockHtml}
             <div class="vlines" data-lines-for="${p.id}"></div>
             <button type="button" class="vadd" onclick="openProductDetail('${p.id}')">+ ADD SIZE</button>
         ` : `
             ${p.cat === 'limited' || p.variants.length <= SIMPLE_MAX ? `<div class="product-price" data-price-for="${p.id}"></div>` : ''}
+            ${p.cat === 'nails' ? `<div class="vsize-note" style="color: #16a34a; font-weight: 800;">46+ BOXES = 5% PALLET SAVINGS</div>` : ''}
             ${stockHtml}
             <div class="qty-wrapper"><input type="number" value="0" min="0" ${p.cat === 'limited' ? 'max="1"' : ''} class="qty-input"
                 onfocus="clearZero(this)" aria-label="Quantity of boxes"
@@ -663,14 +691,94 @@ function buildInvoice() {
         });
     });
 
-    const phone = document.getElementById('customer-phone').value.trim();
-    const discount = loyaltyDB[phone] ? subtotal * loyaltyDB[phone].discount : 0;
-    const tax = (subtotal - discount) * 0.07;
+    // 1. Volume Discount: 1% per $1,000, capped at 5% max
+    const thousands = Math.floor(subtotal / 1000);
+    const volPercent = Math.min(5, Math.max(0, thousands));
+    const volAmount = (subtotal * volPercent) / 100;
+
+    // 2. Pallet Discount: 5% on lines with >= 46 boxes
+    let palletDiscount = 0;
+    let palletBoxesCount = 0;
+    orderLines.forEach(l => {
+        if (l.qty >= PALLET_BOXES) {
+            const p = findProduct(l.pid);
+            if (p && p.cat !== 'limited') {
+                const v = findVariant(p, l.sku);
+                const lineAmt = priceFor(p, v) * l.qty;
+                palletDiscount += (lineAmt * 0.05);
+                palletBoxesCount += l.qty;
+            }
+        }
+    });
+    palletDiscount = Math.round(palletDiscount * 100) / 100;
+
+    // 3. Loyalty Tier Discount from phone lookup
+    const loyaltyPercent = currentLoyalty.percent || 0;
+    const loyaltyAmount = Math.round(((subtotal * loyaltyPercent) / 100) * 100) / 100;
+
+    const totalDiscount = Math.round((volAmount + palletDiscount + loyaltyAmount) * 100) / 100;
+    const taxable = Math.max(0, subtotal - totalDiscount);
+    const tax = Math.round(taxable * 0.07 * 100) / 100;
+    const finalTotal = Math.round((taxable + tax) * 100) / 100;
+
     document.getElementById('inv-subtotal').innerText = `$${subtotal.toFixed(2)}`;
-    document.getElementById('inv-loyalty-row').style.display = discount > 0 ? 'flex' : 'none';
-    document.getElementById('inv-loyalty-discount').innerText = `-$${discount.toFixed(2)}`;
+
+    const discBox = document.getElementById('inv-discounts-box');
+    const volRow = document.getElementById('inv-vol-row');
+    const palRow = document.getElementById('inv-pal-row');
+    const loyRow = document.getElementById('inv-loy-row');
+    const banner = document.getElementById('loyalty-status-banner');
+
+    if (totalDiscount > 0) {
+        if (discBox) discBox.style.display = 'block';
+
+        if (volRow) {
+            if (volPercent > 0) {
+                volRow.style.display = 'flex';
+                document.getElementById('inv-vol-label').innerText = `VOLUME DISCOUNT (${volPercent}% ON $${thousands}K+):`;
+                document.getElementById('inv-vol-amt').innerText = `-$${volAmount.toFixed(2)}`;
+            } else {
+                volRow.style.display = 'none';
+            }
+        }
+
+        if (palRow) {
+            if (palletDiscount > 0) {
+                palRow.style.display = 'flex';
+                document.getElementById('inv-pal-label').innerText = `FULL PALLET DISCOUNT (5% ON ${palletBoxesCount} BXS):`;
+                document.getElementById('inv-pal-amt').innerText = `-$${palletDiscount.toFixed(2)}`;
+            } else {
+                palRow.style.display = 'none';
+            }
+        }
+
+        if (loyRow) {
+            if (loyaltyPercent > 0) {
+                loyRow.style.display = 'flex';
+                document.getElementById('inv-loy-label').innerText = currentLoyalty.badge || `CONTRACTOR LOYALTY (${loyaltyPercent}%):`;
+                document.getElementById('inv-loy-amt').innerText = `-$${loyaltyAmount.toFixed(2)}`;
+            } else {
+                loyRow.style.display = 'none';
+            }
+        }
+
+        const totalSavingsEl = document.getElementById('inv-total-savings');
+        if (totalSavingsEl) totalSavingsEl.innerText = `-$${totalDiscount.toFixed(2)}`;
+    } else {
+        if (discBox) discBox.style.display = 'none';
+    }
+
+    if (banner) {
+        if (currentLoyalty.badge) {
+            banner.style.display = 'block';
+            banner.innerText = currentLoyalty.badge + (currentLoyalty.isTest ? ' [TEST OVERRIDE: $9K SPEND]' : '');
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+
     document.getElementById('inv-tax').innerText = `$${tax.toFixed(2)}`;
-    document.getElementById('inv-total').innerText = `$${(subtotal - discount + tax).toFixed(2)}`;
+    document.getElementById('inv-total').innerText = `$${finalTotal.toFixed(2)}`;
     document.getElementById('invoice-date-dynamic').innerText =
         'DATE: ' + new Date().toLocaleDateString();
 }
@@ -696,7 +804,12 @@ function orderLinesToGAItems() {
 const triggerCheckout = (e) => {
     if (e) e.preventDefault();
     if (!orderLines.length) return alert('Select items first.');
-    buildInvoice();
+    const phoneInp = document.getElementById('customer-phone');
+    if (phoneInp && phoneInp.value) {
+        fetchLoyalty(phoneInp.value);
+    } else {
+        buildInvoice();
+    }
     checkoutModal.style.display = 'block';
     pushOverlay();
     if (typeof gtag === 'function') {
@@ -776,7 +889,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('complete-order').onclick = triggerCheckout;
 
     const phoneInp = document.getElementById('customer-phone');
-    if (phoneInp) phoneInp.addEventListener('input', buildInvoice);
+    if (phoneInp) phoneInp.addEventListener('input', e => fetchLoyalty(e.target.value));
 
     /* Order submission — POST /api/order, then a success screen. Stripe
        creates a DRAFT invoice; payment happens off-site when the shop

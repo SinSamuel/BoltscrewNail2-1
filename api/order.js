@@ -1,5 +1,6 @@
 import { getStripe } from '../lib/stripe.js';
 import { sendOrderNotifications } from '../lib/notifications.js';
+import { normalizePhone, calcVolumeDiscount, getLoyaltyTier, TEST_PHONE, TEST_SPEND_60D, PALLET_BOXES_DEFAULT } from '../lib/discounts.js';
 
 /**
  * POST /api/order
@@ -116,13 +117,72 @@ export default async function handler(req, res) {
     // Keep the latest shipping/contact details on the customer.
     cust = await stripe.customers.update(cust.id, { shipping: shippingPayload(customer, delivery) });
 
-    // 3. Draft invoice + line items. Embed the exact cart in invoice metadata
-    //    so the webhook can decrement stock without re-deriving anything.
+    // 3. Stackable Discounts Calculation:
+    // (A) Volume: 1% per $1k order spend (max 5%)
+    // (B) Pallet: 5% on lines with >= 46 boxes
+    // (C) 60-day Loyalty Tier: Silver 5%, Gold 10%, Star 13% based on customer phone
+    const subtotalDollars = subtotalCents / 100;
+    const vol = calcVolumeDiscount(subtotalDollars);
+
+    let palletDiscountDollars = 0;
+    const palletLines = [];
+    for (const l of lineInfo) {
+        if (l.qty >= PALLET_BOXES_DEFAULT) {
+            const lineAmt = (l.unit * l.qty) / 100;
+            const lineDisc = (lineAmt * 5) / 100;
+            palletDiscountDollars += lineDisc;
+            palletLines.push(`${l.qty}x ${l.name}`);
+        }
+    }
+    palletDiscountDollars = Math.round(palletDiscountDollars * 100) / 100;
+
+    // Loyalty Tier Lookup
+    const normPhone = normalizePhone(customer.phone);
+    let spend60d = 0;
+    if (normPhone === TEST_PHONE) {
+        spend60d = TEST_SPEND_60D;
+    } else {
+        try {
+            const sixtyDaysAgo = Math.floor(Date.now() / 1000) - (60 * 24 * 60 * 60);
+            const invList = await stripe.invoices.list({
+                customer: cust.id,
+                status: 'paid',
+                created: { gte: sixtyDaysAgo },
+                limit: 100
+            });
+            const spendCents = (invList.data || []).reduce((sum, inv) => sum + (inv.amount_paid || 0), 0);
+            spend60d = spendCents / 100;
+        } catch (e) {
+            console.error('[order] loyalty spend query error:', e.message);
+        }
+    }
+    const loyaltyTier = getLoyaltyTier(spend60d);
+    const loyaltyDiscountDollars = Math.round(((subtotalDollars * loyaltyTier.percent) / 100) * 100) / 100;
+
+    const discounts = [];
+    if (vol.active) {
+        discounts.push({ label: vol.label, amount: vol.amount, percent: vol.percent });
+    }
+    if (palletDiscountDollars > 0) {
+        discounts.push({ label: `FULL PALLET DISCOUNT (5% ON ${palletLines.join(', ')})`, amount: palletDiscountDollars, percent: 5 });
+    }
+    if (loyaltyTier.percent > 0) {
+        discounts.push({ label: loyaltyTier.badge, amount: loyaltyDiscountDollars, percent: loyaltyTier.percent });
+    }
+
+    const totalDiscountDollars = Math.round((vol.amount + palletDiscountDollars + loyaltyDiscountDollars) * 100) / 100;
+    const totalDiscountCents = Math.round(totalDiscountDollars * 100);
+
+    const taxableCents = Math.max(0, subtotalCents - totalDiscountCents);
+    const taxCents = AUTO_TAX ? 0 : Math.round(taxableCents * TAX_PERCENT / 100);
+    const estimatedTotalDollars = (taxableCents + taxCents) / 100;
+
+    // Embed cart and discounts in invoice metadata
     const cartPayload = lineInfo.map(l => ({ priceId: l.priceId, productId: l.productId, qty: l.qty }));
-    const subtotalCents = lineInfo.reduce((s, l) => s + l.unit * l.qty, 0);
-    const taxCents = AUTO_TAX ? 0 : Math.round(subtotalCents * TAX_PERCENT / 100);
     const invoiceMeta = Object.assign({
         cart: JSON.stringify(cartPayload),
+        discounts: JSON.stringify(discounts),
+        total_discount: String(totalDiscountDollars),
         confirm,
         source: 'website',
         stock_deducted: 'false'
@@ -145,6 +205,18 @@ export default async function handler(req, res) {
             quantity: line.qty
         });
     }
+
+    // Add discount savings credit line item if any discounts applied
+    if (totalDiscountCents > 0) {
+        await stripe.invoiceItems.create({
+            customer: cust.id,
+            invoice: invoice.id,
+            currency: invoice.currency,
+            amount: -totalDiscountCents,
+            description: `CONTRACTOR DISCOUNT SAVINGS — ${discounts.map(d => d.label).join(' | ')}`
+        });
+    }
+
     if (!AUTO_TAX && taxCents > 0) {
         await stripe.invoiceItems.create({
             customer: cust.id,
@@ -169,9 +241,11 @@ export default async function handler(req, res) {
         delivery,
         confirm,
         items: orderItems,
-        subtotal: subtotalCents / 100,
+        subtotal: subtotalDollars,
+        discounts,
+        discountTotal: totalDiscountDollars,
         tax: taxCents / 100,
-        total: (subtotalCents + taxCents) / 100
+        total: estimatedTotalDollars
     }).catch(err => console.error('[order] Notification dispatch error:', err));
 
     return res.status(200).json({
@@ -179,9 +253,11 @@ export default async function handler(req, res) {
         status: 'draft',
         confirm,
         currency: invoice.currency,
-        estimatedSubtotal: subtotalCents / 100,
+        estimatedSubtotal: subtotalDollars,
+        discounts,
+        totalDiscount: totalDiscountDollars,
         estimatedTax: taxCents / 100,
-        estimatedTotal: (subtotalCents + taxCents) / 100,
+        estimatedTotal: estimatedTotalDollars,
         taxPercent: TAX_PERCENT,
         taxLocation: TAX_LOCATION,
         automaticTax: AUTO_TAX

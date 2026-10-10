@@ -9,8 +9,8 @@
     <title>ORDER HUB | BOLTSCREWNAIL</title>
     <!-- Sharp Professional Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=5">
-    <link rel="stylesheet" href="shop.css?v=5">
+    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="shop.css?v=7">
 
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-93H8CZMND6"></script>
@@ -130,9 +130,29 @@
             </div>
 
             <div class="invoice-totals">
-                <p style="font-size: 0.9rem;">SUBTOTAL: <span id="inv-subtotal">$0.00</span></p>
-                <div id="inv-loyalty-row" class="loyalty-text" style="display: none; font-size: 1rem; margin: 3px 0;">LOYALTY DISCOUNT: <span id="inv-loyalty-discount">-$0.00</span></div>
-                <p style="font-size: 0.9rem;">TAX (7%): <span id="inv-tax">$0.00</span></p>
+                <p style="font-size: 0.95rem; font-weight: 800;">SUBTOTAL: <span id="inv-subtotal">$0.00</span></p>
+
+                <!-- Dynamic Itemized Discounts -->
+                <div id="inv-discounts-box" style="display: none; margin: 10px 0; padding: 10px 0; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; text-align: left;">
+                    <div id="inv-vol-row" style="display: none; justify-content: space-between; font-size: 0.82rem; color: #15803d; font-weight: 800; margin: 3px 0;">
+                        <span id="inv-vol-label">VOLUME DISCOUNT:</span>
+                        <span id="inv-vol-amt">-$0.00</span>
+                    </div>
+                    <div id="inv-pal-row" style="display: none; justify-content: space-between; font-size: 0.82rem; color: #15803d; font-weight: 800; margin: 3px 0;">
+                        <span id="inv-pal-label">FULL PALLET DISCOUNT (5%):</span>
+                        <span id="inv-pal-amt">-$0.00</span>
+                    </div>
+                    <div id="inv-loy-row" style="display: none; justify-content: space-between; font-size: 0.82rem; color: #15803d; font-weight: 800; margin: 3px 0;">
+                        <span id="inv-loy-label">CONTRACTOR LOYALTY:</span>
+                        <span id="inv-loy-amt">-$0.00</span>
+                    </div>
+                    <div id="inv-total-discount-row" style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #15803d; font-weight: 950; margin-top: 5px; padding-top: 5px; border-top: 1px solid #e5e7eb;">
+                        <span>TOTAL SAVINGS:</span>
+                        <span id="inv-total-savings">-$0.00</span>
+                    </div>
+                </div>
+
+                <p style="font-size: 0.9rem; color: #555;">TAX (7%): <span id="inv-tax">$0.00</span></p>
                 <h3 style="font-size: 1.8rem; font-weight: 950; margin-top: 5px; border-bottom: 4px solid #000; display: inline-block;">TOTAL: <span id="inv-total">$0.00</span></h3>
             </div>
 
@@ -142,6 +162,7 @@
                 <!-- Section 1 -->
                 <div style="margin-bottom: 25px;">
                     <h4 style="font-size: 0.7rem; letter-spacing: 2px; color: #888; margin-bottom: 15px; font-weight: 950;">CUSTOMER INFORMATION</h4>
+                    <div id="loyalty-status-banner" style="display: none; background: #f0fdf4; border: 1.5px solid #16a34a; color: #15803d; padding: 10px 14px; font-weight: 900; font-size: 0.85rem; margin-bottom: 12px; border-radius: 4px; text-align: center;"></div>
                     <div class="form-grid-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <input type="text" id="cust-name" placeholder="FULL NAME" required style="grid-column: span 2; padding: 12px; border: 1px solid #000;">
                         <input type="text" id="cust-company" placeholder="COMPANY NAME" required style="padding: 12px; border: 1px solid #000;">
@@ -175,6 +196,6 @@
         </div>
     </div>
 
-    <script src="shop.js?v=6"></script>
+    <script src="shop.js?v=7"></script>
 </body>
 </html>
