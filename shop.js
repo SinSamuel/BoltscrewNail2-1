@@ -288,50 +288,6 @@ function cardStockText(p) {
     return total > 0 ? total + ' IN STOCK' : 'SOLD OUT';
 }
 
-function cardGalleryHtml(p) {
-    const imgs = (p.images && p.images.length) ? p.images : (p.thumb ? [p.thumb] : []);
-    if (imgs.length <= 1) {
-        return `<div class="product-img" onclick="openProductDetail('${p.id}')">
-            <img src="${p.thumb || ''}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
-        </div>`;
-    }
-    return `<div class="product-img product-img-carousel" data-card-carousel="${p.id}">
-        <img class="card-carousel-img" src="${imgs[0]}" alt="${p.name}" loading="lazy" onclick="openProductDetail('${p.id}')">
-        <div class="card-carousel-dots">
-            ${imgs.map((_, i) => `<span class="card-carousel-dot${i === 0 ? ' is-active' : ''}" data-idx="${i}" onclick="cardImgGo(event, '${p.id}', ${i})"></span>`).join('')}
-        </div>
-    </div>`;
-}
-
-window.cardImgStep = function(e, pid, delta) {
-    e.stopPropagation();
-    const p = findProduct(pid);
-    if (!p || !p.images || p.images.length <= 1) return;
-    const box = document.querySelector(`[data-card-carousel="${pid}"]`);
-    if (!box) return;
-    const imgEl = box.querySelector('.card-carousel-img');
-    const dots = box.querySelectorAll('.card-carousel-dot');
-    let cur = parseInt(box.dataset.curIdx || '0', 10);
-    const n = p.images.length;
-    cur = ((cur + delta) % n + n) % n;
-    box.dataset.curIdx = cur;
-    if (imgEl) imgEl.src = p.images[cur];
-    dots.forEach((d, idx) => d.classList.toggle('is-active', idx === cur));
-};
-
-window.cardImgGo = function(e, pid, idx) {
-    e.stopPropagation();
-    const p = findProduct(pid);
-    if (!p || !p.images || !p.images[idx]) return;
-    const box = document.querySelector(`[data-card-carousel="${pid}"]`);
-    if (!box) return;
-    const imgEl = box.querySelector('.card-carousel-img');
-    const dots = box.querySelectorAll('.card-carousel-dot');
-    box.dataset.curIdx = idx;
-    if (imgEl) imgEl.src = p.images[idx];
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-};
-
 function renderCard(p) {
     const grid = document.getElementById(`grid-${p.sub}`);
     if (!grid) return;
@@ -343,7 +299,9 @@ function renderCard(p) {
     const stockHtml = stockText
         ? `<div class="${stockText === 'SOLD OUT' ? 'vstock soldout' : 'vstock'}">${stockText}</div>` : '';
     card.innerHTML = `
-        ${cardGalleryHtml(p)}
+        <div class="product-img" onclick="openProductDetail('${p.id}')">
+            <img src="${p.thumb || (p.images && p.images[0]) || ''}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
+        </div>
         <div class="product-info-top" onclick="openProductDetail('${p.id}')">
             <h3>${p.name}</h3>
         </div>
@@ -523,8 +481,6 @@ function openGallery(p) {
         <div class="gallery">
             <div class="gallery-stage">
                 <img id="gallery-img" src="${srcs[0]}" alt="${p.name}">
-                <button type="button" class="gallery-nav gallery-prev" aria-label="Previous image">&#10094;</button>
-                <button type="button" class="gallery-nav gallery-next" aria-label="Next image">&#10095;</button>
             </div>
             <div class="gallery-bar">
                 <div class="gallery-dots">
@@ -551,8 +507,10 @@ function galleryGo(i) {
 function wireGallery() {
     const stage = document.querySelector('.gallery-stage');
     if (!stage) return;
-    stage.querySelector('.gallery-prev').onclick = e => { e.stopPropagation(); galleryGo(gallery.index - 1); };
-    stage.querySelector('.gallery-next').onclick = e => { e.stopPropagation(); galleryGo(gallery.index + 1); };
+    const prevBtn = stage.querySelector('.gallery-prev');
+    if (prevBtn) prevBtn.onclick = e => { e.stopPropagation(); galleryGo(gallery.index - 1); };
+    const nextBtn = stage.querySelector('.gallery-next');
+    if (nextBtn) nextBtn.onclick = e => { e.stopPropagation(); galleryGo(gallery.index + 1); };
     document.querySelectorAll('.gallery-dot').forEach(d => {
         d.onclick = e => { e.stopPropagation(); galleryGo(+d.dataset.gi); };
     });
