@@ -9,8 +9,8 @@
     <title>ORDER HUB | BOLTSCREWNAIL</title>
     <!-- Sharp Professional Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=12">
-    <link rel="stylesheet" href="shop.css?v=12">
+    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="shop.css?v=13">
 
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-93H8CZMND6"></script>
@@ -89,14 +89,18 @@
     <!-- Product Detail Modal -->
     <div id="product-modal" class="modal">
         <div class="modal-content detail-style">
-            <span class="close-modal-btn">&times;</span>
+            <div class="modal-top-bar">
+                <span class="close-modal-btn" aria-label="Close modal">&times;</span>
+            </div>
             <div class="modal-layout">
                 <div id="modal-img-container" class="modal-image"></div>
                 <div class="modal-info">
-                    <h2 id="modal-title" style="font-size: 2rem; font-weight: 950;">Product Name</h2>
-                    <div style="border-top: 1px solid #333; margin-top: 20px; padding-top: 20px;">
-                        <h4 style="font-size: 0.7rem; color: #555; margin-bottom: 10px;">TECHNICAL DESCRIPTION</h4>
-                        <p id="modal-desc" style="color: #fff; font-size: 1.3rem; font-weight: 700;">Description text.</p>
+                    <h2 id="modal-title">Product Name</h2>
+                    <div class="modal-desc-container">
+                        <h4 class="modal-desc-heading">TECHNICAL DESCRIPTION</h4>
+                        <div class="modal-desc-scroll">
+                            <p id="modal-desc">Description text.</p>
+                        </div>
                     </div>
                     <div id="modal-variants"></div>
                 </div>
