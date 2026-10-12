@@ -297,8 +297,6 @@ function cardGalleryHtml(p) {
     }
     return `<div class="product-img product-img-carousel" data-card-carousel="${p.id}">
         <img class="card-carousel-img" src="${imgs[0]}" alt="${p.name}" loading="lazy" onclick="openProductDetail('${p.id}')">
-        <button type="button" class="card-carousel-btn card-carousel-prev" aria-label="Previous" onclick="cardImgStep(event, '${p.id}', -1)">&#10094;</button>
-        <button type="button" class="card-carousel-btn card-carousel-next" aria-label="Next" onclick="cardImgStep(event, '${p.id}', 1)">&#10095;</button>
         <div class="card-carousel-dots">
             ${imgs.map((_, i) => `<span class="card-carousel-dot${i === 0 ? ' is-active' : ''}" data-idx="${i}" onclick="cardImgGo(event, '${p.id}', ${i})"></span>`).join('')}
         </div>
