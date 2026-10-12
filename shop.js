@@ -223,7 +223,25 @@ function buildProducts(items) {
             variants
         });
     });
-    return out.sort((a, b) => (a.order || 999) - (b.order || 999) || a.name.localeCompare(b.name));
+    return out.sort((a, b) => {
+        const aOrd = (a.order && a.order < 999) ? a.order : Infinity;
+        const bOrd = (b.order && b.order < 999) ? b.order : Infinity;
+        if (aOrd !== bOrd) return aOrd - bOrd;
+
+        // Total stock of card (or parent stock)
+        const aStockKnown = a.variants.filter(v => v.stock != null);
+        const aStock = aStockKnown.length ? aStockKnown.reduce((s, v) => s + v.stock, 0) : -1;
+        const bStockKnown = b.variants.filter(v => v.stock != null);
+        const bStock = bStockKnown.length ? bStockKnown.reduce((s, v) => s + v.stock, 0) : -1;
+        if (bStock !== aStock) return bStock - aStock;
+
+        // Highest price of card
+        const aPrice = a.variants.length ? Math.max.apply(null, a.variants.map(v => v.price || 0)) : 0;
+        const bPrice = b.variants.length ? Math.max.apply(null, b.variants.map(v => v.price || 0)) : 0;
+        if (bPrice !== aPrice) return bPrice - aPrice;
+
+        return a.name.localeCompare(b.name);
+    });
 }
 
 /* Products whose cat/sub has no matching section in shop.html get a backing
