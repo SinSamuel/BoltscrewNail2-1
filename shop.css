@@ -380,24 +380,27 @@ tr.inv-sub td {
     border: 1px solid #222;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
     border-radius: 4px;
+    position: relative; /* anchor for the absolute close btn */
 }
 
-/* Dedicated top bar for the X button — no overlap with title */
+/* X close button — floats in top-right corner, takes zero layout space */
 .modal-top-bar {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 8px;
+    display: contents; /* no box, no space, children fall into parent flow */
 }
 .modal-top-bar .close-modal-btn {
-    position: static;
-    font-size: 2.2rem;
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    z-index: 50;
+    font-size: 2rem;
     line-height: 1;
     color: #888;
     cursor: pointer;
     transition: color 0.15s ease;
-    padding: 4px;
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    user-select: none;
 }
 .modal-top-bar .close-modal-btn:hover { color: #fff; }
 
