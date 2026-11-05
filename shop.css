@@ -72,8 +72,11 @@ html.modal-open, body.modal-open { overflow: hidden; }
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 50px; }
 .product-card { background: var(--metal-dark); border: 1px solid var(--metal-mid); padding: 12px; text-align: center; cursor: pointer; display: flex; flex-direction: column; }
 .product-card:hover { border-color: var(--metal-white); }
-.product-img { width: 100%; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; background: #000; padding: 6px; position: relative; }
-.product-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.product-img { width: 100%; aspect-ratio: 1/1; min-height: 0; flex: 0 0 auto; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; background: #000; padding: 6px; position: relative; }
+/* Every source photo gets the same square frame: the image fills the frame
+   and is letterboxed by object-fit, so a tall or tiny source can never
+   change the card's size. */
+.product-img img { display: block; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; }
 
 /* Product card title: proportional, crisp, and comfortable spacing */
 .product-info-top { margin-bottom: 6px; }
