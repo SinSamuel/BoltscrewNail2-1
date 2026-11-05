@@ -362,11 +362,13 @@ window.showQtyLimitPopup = function (name, msg) {
     document.getElementById('qty-popup-sub').textContent =
         msg || ((name ? name + ' is' : 'This item is') + ' limited to one per order.');
     pop.classList.add('is-open');
+    syncScrollLock();
     pushOverlay();
 };
 function closeQtyLimitPopup() {
     const pop = document.getElementById('qty-popup');
     if (pop) pop.classList.remove('is-open');
+    syncScrollLock();
 }
 
 /* Overlays take a history entry so the phone Back button closes them rather
@@ -381,6 +383,18 @@ function hideOverlays() {
     if (productModal) productModal.style.display = 'none';
     if (checkoutModal) checkoutModal.style.display = 'none';
     closeQtyLimitPopup();
+    syncScrollLock();
+}
+/* Freeze the shop behind any open overlay so the page underneath cannot be
+   scrolled while the popup is up. */
+function syncScrollLock() {
+    const anyOpen = !!(
+        (productModal && productModal.style.display === 'block') ||
+        (checkoutModal && checkoutModal.style.display === 'block') ||
+        document.querySelector('.qty-popup.is-open')
+    );
+    document.documentElement.classList.toggle('modal-open', anyOpen);
+    document.body.classList.toggle('modal-open', anyOpen);
 }
 /* A Back that arrives while an overlay is open is consumed by that overlay:
    clear the stack outright rather than peeling one entry off it. */
@@ -545,6 +559,7 @@ function wireGallery() {
 window.openProductDetail = function (pid) {
     const p = findProduct(pid);
     productModal.style.display = 'block';
+    syncScrollLock();
     pushOverlay();
     document.getElementById('modal-title').innerText = p.name;
     document.getElementById('modal-desc').innerText = p.detail || '';
@@ -830,6 +845,7 @@ const triggerCheckout = (e) => {
         buildInvoice();
     }
     checkoutModal.style.display = 'block';
+    syncScrollLock();
     pushOverlay();
     if (typeof gtag === 'function') {
         gtag('event', 'begin_checkout', { currency: 'usd', value: orderSubtotal(), items: orderLinesToGAItems() });

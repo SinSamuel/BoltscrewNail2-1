@@ -7,12 +7,17 @@
     --font-heading: 'Inter', sans-serif;
 }
 
+html { scrollbar-gutter: stable; }
+
 body.shop-page {
     background-color: var(--primary-black);
     color: var(--metal-white);
     font-family: var(--font-heading);
     overflow-x: hidden;
 }
+
+/* While a product/checkout/qty popup is open the page behind it is frozen. */
+html.modal-open, body.modal-open { overflow: hidden; }
 
 /* Nav */
 .shop-nav-special { background: #000; border-bottom: 3px solid var(--metal-mid); position: sticky; top: 0; z-index: 2000; height: 60px; display: flex; align-items: center; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -89,7 +94,7 @@ body.shop-page {
 .product-price { font-size: 1.1rem; font-weight: 900; color: #555; }
 
 /* MODAL DESIGN REFINED: ENSURING NO OVERFLOW ON MOBILE */
-.modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.95); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .modal-content { 
     background: #050505; margin: 3vh auto; border: 1px solid #111; max-width: 800px; width: 95%; position: relative; 
     padding: 20px; /* ADEQUATE FOR MOBILE */
@@ -372,15 +377,20 @@ tr.inv-sub td {
 
 /* ================= PRODUCT MODAL LAYOUT ================= */
 .modal-content.detail-style {
-    max-width: 960px;
-    width: 92%;
-    margin: 4vh auto;
+    /* Takes over the viewport instead of sitting in a small centered box. */
+    max-width: none;
+    width: min(1200px, 96vw);
+    min-height: calc(100vh - 6vh);
+    min-height: calc(100dvh - 6vh);
+    margin: 3vh auto;
     padding: 24px 32px 32px;
     background: #080808;
     border: 1px solid #222;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
     border-radius: 4px;
     position: relative; /* anchor for the absolute close btn */
+    display: flex;
+    flex-direction: column;
 }
 
 /* X close button — floats in top-right corner, takes zero layout space */
@@ -408,6 +418,7 @@ tr.inv-sub td {
     display: flex;
     gap: 36px;
     align-items: stretch;
+    flex: 1 1 auto;
     min-height: 480px;
 }
 
@@ -421,7 +432,7 @@ tr.inv-sub td {
     display: block;
     width: 100%;
     height: auto;
-    max-height: 52vh;
+    max-height: 62vh;
     object-fit: contain;
     object-position: center;
     background: #000;
@@ -490,9 +501,13 @@ tr.inv-sub td {
 
 @media (max-width: 768px) {
     .modal-content.detail-style {
-        width: 96%;
-        margin: 2vh auto;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
         padding: 16px;
+        border: none;
+        border-radius: 0;
     }
     .modal-layout {
         flex-direction: column;
@@ -500,7 +515,7 @@ tr.inv-sub td {
         min-height: auto;
     }
     .modal-image { flex: 0 0 auto; width: 100%; }
-    .modal-image img { max-height: 32vh; padding: 6px; }
+    .modal-image img { max-height: 34vh; padding: 6px; }
     .modal-info { width: 100%; }
     .modal-info h2 { font-size: 1.35rem !important; margin-bottom: 12px; }
     .modal-desc-container { min-height: auto; }
