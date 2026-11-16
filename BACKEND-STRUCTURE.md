@@ -105,6 +105,14 @@ boltscrewnails2.0/
 }
 ```
 
+**`GET /api/img?u=<source URL>&w=<width>`** — product photo resizer.
+Stripe/Postimages serve the uploaded photos at full resolution (1000-1600px)
+while the shop cards draw them at ~200px. This endpoint fetches the original,
+resizes it with `sharp` and returns WebP (`w` = 200 / 400 / 1200), cached on
+the CDN for a year. Only `files.stripe.com`, `i.postimg.cc` and `i.imgur.com`
+are accepted; any failure redirects to the untouched original so a photo never
+disappears.
+
 **`POST /api/order`** — validates live stock, then creates a **DRAFT**
 invoice (`collection_method: send_invoice`, `days_until_due: 7`) with Stripe
 automatic tax; the site never collects payment. The exact cart is embedded

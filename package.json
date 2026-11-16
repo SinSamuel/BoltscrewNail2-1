@@ -11,6 +11,7 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
+    "sharp": "^0.35.5",
     "stripe": "^18.5.0"
   },
   "devDependencies": {

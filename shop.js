@@ -18,6 +18,27 @@ const PALLET_BOXES = 46;
 let currentLoyalty = { tier: null, percent: 0, badge: null, spend60d: 0, isTest: false };
 let loyaltyTimer = null;
 
+/* Photos in the Stripe catalog are uploaded at full resolution (often
+   1000-1600px) while the cards draw them at ~200px. Route them through our
+   own resizer so the browser only downloads the pixels it actually shows.
+   Local assets and data URIs are left untouched. */
+const CARD_IMG_WIDTHS = [200, 400];
+const MODAL_IMG_WIDTH = 1200;
+
+function canResize(src) {
+    return !!src && /^https?:\/\//i.test(src);
+}
+
+function imgUrl(src, width) {
+    if (!canResize(src)) return src || '';
+    return '/api/img?u=' + encodeURIComponent(src) + '&w=' + width;
+}
+
+function imgSrcSet(src, widths) {
+    if (!canResize(src)) return '';
+    return widths.map(w => imgUrl(src, w) + ' ' + w + 'w').join(', ');
+}
+
 function fetchLoyalty(phoneVal) {
     clearTimeout(loyaltyTimer);
     const clean = String(phoneVal || '').replace(/\D/g, '');
@@ -314,11 +335,15 @@ function renderCard(p) {
     card.dataset.pid = p.id;
     const many = p.variants.length > SIMPLE_MAX;
     const stockText = cardStockText(p);
+    const thumb = p.thumb || (p.images && p.images[0]) || '';
     const stockHtml = stockText
         ? `<div class="${stockText === 'SOLD OUT' ? 'vstock soldout' : 'vstock'}">${stockText}</div>` : '';
     card.innerHTML = `
         <div class="product-img" onclick="openProductDetail('${p.id}')">
-            <img src="${p.thumb || (p.images && p.images[0]) || ''}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.style.display='none'">
+            <img src="${imgUrl(thumb, CARD_IMG_WIDTHS[1])}"
+                 srcset="${imgSrcSet(thumb, CARD_IMG_WIDTHS)}"
+                 sizes="(max-width: 768px) 46vw, (max-width: 1440px) 25vw, 320px"
+                 alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.style.display='none'">
         </div>
         <div class="product-info-top" onclick="openProductDetail('${p.id}')">
             <h3>${p.name}</h3>
@@ -496,8 +521,10 @@ window.bumpLine = function (pid, sku, delta) {
 let gallery = { srcs: [], index: 0 };
 
 function gallerySrcs(p) {
-    if (Array.isArray(p.images) && p.images.length) return p.images;
-    return p.thumb ? [p.thumb] : [];
+    const raw = (Array.isArray(p.images) && p.images.length)
+        ? p.images
+        : (p.thumb ? [p.thumb] : []);
+    return raw.map(src => imgUrl(src, MODAL_IMG_WIDTH));
 }
 
 function openGallery(p) {
