@@ -64,7 +64,7 @@ configuration + a handful of endpoints on the existing Vercel backend.
 | Layer | Choice | Why | Cost (list, Nov 2026) |
 |---|---|---|---|
 | **Telephony + SMS** | **Twilio** (US local number) | Own the number, works with any AI vendor, 2-way SMS included | $1.15/mo per number; inbound voice $0.0085/min; SMS $0.0083 + ~$0.004 carrier fee per segment |
-| **Voice agent brain** | **ElevenLabs Agents** | Native voice cloning, 74 languages incl. Spanish, built-in phone + SMS channel, tool/webhook calls, transcripts | $6/mo Starter (75 min) → $22 Creator (275 min) → $99 Pro (1,238 min); extra minutes $0.08; SMS $0.003/msg |
+| **Voice agent brain** | **ElevenLabs Agents** (start on **Starter $6**) | Native voice cloning, 74 languages incl. Spanish, built-in phone + SMS channel, tool/webhook calls, transcripts | $6/mo Starter (75 min) → $22 Creator (275 min) → $99 Pro (1,238 min); extra minutes $0.08; SMS $0.003/msg |
 | **LLM** | Model chosen inside ElevenLabs (or bring our own key) | Handles reasoning + tool calls; can swap without changing voice | Billed on top; budget ~$0.01–0.03/min |
 | **Our backend** | Existing Vercel functions | Reuse `/api/products`, `/api/order`, `/api/loyalty` | already paid |
 | **Email** | **Resend** (already used for notifications) + inbound webhook | 24/7 inbox, same tools, proper threading; no new vendor to learn | free tier covers this volume; domain ~$12/yr |
@@ -513,6 +513,14 @@ emails(id, thread_id, direction, subject, body_text, provider_id, status, needs_
 
 ## 8. Phases and acceptance criteria
 
+**Phase -1 — Infrastructure consolidation (½ day, do this first)**
+
+- [ ] One domain bought and attached to Vercel
+- [ ] One GitHub repo, one Vercel project, old projects retired
+- [ ] Local working copy replaced with a clean clone
+- Full checklist: **`INFRASTRUCTURE.md`**. This is not optional: the 24/7 email
+  channel and the GV port both need a real domain and a single canonical site.
+
 **Phase 0 — Accounts & registration (days 1–3, mostly waiting)**
 
 - [ ] Twilio account + a cheap temporary US local number (used for testing only)
@@ -578,7 +586,8 @@ emails(id, thread_id, direction, subject, body_text, provider_id, status, needs_
 
 ## 9. Cost model
 
-List prices, Nov 2026 — re-verify before committing.
+List prices, Nov 2026 — re-verify before committing. **The cost driver is minutes,
+not the platform.** Everything else is rounding error.
 
 | Item | Rate |
 |---|---|
@@ -587,29 +596,53 @@ List prices, Nov 2026 — re-verify before committing.
 | Twilio SMS out | $0.0083/segment + ~$0.004 carrier fee |
 | Twilio Lookup (recipient time zone for the SMS gate) | ~$0.005/lookup |
 | Domain + email | ~$12/yr domain; Resend free tier covers this volume |
-| ElevenLabs Agents plan | $22/mo (Creator, 275 min) or $99/mo (Pro, 1,238 min) |
-| ElevenLabs extra minutes | $0.08/min |
+| ElevenLabs Agents Starter | **$6/mo, includes 75 min** |
+| ElevenLabs Agents Creator | $22/mo, includes 275 min |
+| ElevenLabs extra minutes | $0.08/min (one rate covers speech in, speech out and their default model) |
 | ElevenLabs SMS | $0.003/message |
-| LLM | ~$0.01–0.03/min |
-| 10DLC | one-time brand/campaign fee + small monthly campaign fee |
+| 10DLC | ~$4–20 one-time (brand + campaign) + ~$2–3/mo campaign fee |
 
-**Worked example — 300 calls/month × 3 min = 900 minutes**
+### 9.1 Three realistic tiers
 
-| Line | Monthly |
-|---|---|
-| ElevenLabs (Creator 275 min + 625 extra × $0.08) | $72 |
-| LLM (~900 min × $0.02) | $18 |
-| Twilio voice (900 × $0.0085) | $7.65 |
-| Twilio number | $1.15 |
-| 400 SMS (Twilio + ElevenLabs) | ~$7 |
-| 10DLC campaign fee | ~$2–10 |
-| **Total** | **≈ $108–116/mo** |
+| Line | **Pilot** — 75 min/mo | **Steady** — 250 min/mo | **Busy** — 600 min/mo |
+|---|---|---|---|
+| ElevenLabs | Starter $6 | Starter $6 + 175 × $0.08 = $20 | Creator $22 + 325 × $0.08 = $48 |
+| Twilio voice + number | $1.79 | $3.28 | $6.25 |
+| SMS (≈1 per call) | $1.00 | $3.25 | $7.80 |
+| 10DLC | $3 | $3 | $3 |
+| Domain (annual ÷ 12) | $1 | $1 | $1 |
+| **Total** | **≈ $13/mo** | **≈ $30/mo** | **≈ $66/mo** |
 
-Pilot month (≈60 min of calls) is **under $15** all-in.
+Pilot = ~25–30 short calls a month. Steady = a busy shop line during working hours.
+Busy = 600 minutes, which is a *lot* of talking for one supplier.
 
-Because voice only runs during working hours, minutes stay modest even on a busy
-line — 300 three-minute calls is already a heavy week. Email adds no meaningful
-cost (free tier), so the $108–116/month figure is the realistic ceiling for year one.
+### 9.2 How to keep it cheap (in order of impact)
+
+1. **Let the bot answer second.** Ring Sam's cell 2–3 times first; only calls he
+   misses go to the agent. This is the single biggest lever — it can cut AI minutes
+   by 60–80% while giving *better* service, because regulars still reach a human.
+2. **Keep calls short.** The bot's job is price, stock, hours and order intake.
+   Anything long or unusual → transfer. Target under 3 minutes.
+3. **Stay on Starter until you actually hit 75 minutes two months in a row.** The
+   $16/mo step to Creator only makes sense once extra minutes cost more than it.
+4. **Launch voice first, texts second.** SMS can wait for 10DLC approval and its
+   ~$3/mo; meanwhile Sam texts from the phone as usual.
+5. **Email is free** at this volume (Resend free tier), and a domain is $1/mo.
+
+### 9.3 Alternatives, honestly compared
+
+| Option | Monthly floor | Per minute | Verdict |
+|---|---|---|---|
+| **ElevenLabs Agents** | **$6** | **$0.08** | Cheapest at pilot volume, and the clone is included. **Recommended to start.** |
+| Retell (pay-as-you-go) | $0 | $0.07–0.11 typical | No subscription — but you still pay ElevenLabs $6/mo for the cloned voice, so it only wins above ~300 min/mo |
+| Vapi | $0 + provider costs | similar to Retell | Same math, more assembly |
+| Self-build (Twilio Media Streams + STT + LLM + TTS API) | ~$0 | $0.03–0.06 | Cheapest per minute, most expensive in weeks of work and latency bugs — not now |
+| **No voice yet** (SMS + email only) | ~$2 | — | Valid fallback if the budget is zero, but it is not the product you asked for |
+
+**What I'd actually do:** buy the Twilio number, start on **Starter ($6)**, run the
+bot as *overflow + missed calls*, and expect **~$13–15/month** for the first few
+months. Upgrade only when call volume proves it. The $108/mo figure in the first
+draft assumed 900 minutes — a 24/7 line taking every call, which is not the plan.
 
 ---
 
